@@ -1,0 +1,18 @@
+sigma1
+sigma2
+sigma3
+sigma4
+sigma5
+let start_index = tx_dat.rows_scrolled.max(0) as usize; // Ensure non-negative and cast to usize
+let end_index = (tx_dat.rows_scrolled + ed_dat.term_h).max(0) as usize;
+
+// Make sure end_index doesn't exceed file_lines length
+let end_index = end_index.min(tx_dat.file_lines.len());
+
+let selected_lines = &tx_dat.file_lines[start_index..end_index];
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+a
+a
+a
+a
+12
