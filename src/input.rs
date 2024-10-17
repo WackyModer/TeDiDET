@@ -2,14 +2,14 @@ use tui::widgets::{Block, Borders, Paragraph};
 use tui::layout::{Layout, Constraint, Direction};
 use tui::style::{Style, Color};
 use tui::Terminal;
-use crossterm::event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEvent};
+use crossterm::event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEvent, KeyModifiers};
 use crossterm::terminal::{self, disable_raw_mode, enable_raw_mode};
 
 use crate::mover;
 use crate::util;
 
 
-pub fn check_input(keyenv: Event) -> (bool, Option<KeyEvent>, bool) {
+pub fn check_input(keyenv: Event) -> (bool, Option<KeyEvent>, Option<KeyModifiers>, bool) {
     let mut update = false;
 
     let mut up_h = false;
@@ -19,11 +19,11 @@ pub fn check_input(keyenv: Event) -> (bool, Option<KeyEvent>, bool) {
     }
     if let event::Event::Key(key_event) = keyenv {
         if key_event.kind == crossterm::event::KeyEventKind::Press {
-            return (true, Some(key_event), up_h)
+            return (true, Some(key_event), Some(key_event.modifiers), up_h)
         }
     }
 
-    (update, None, up_h)
+    (update, None, None, up_h)
 }
 
 pub fn handle_keybind() {

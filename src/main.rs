@@ -3,7 +3,7 @@ use tui::backend::CrosstermBackend;
 use tui::widgets::{Block, Borders, Paragraph};
 use tui::layout::{Layout, Constraint, Direction};
 use tui::style::{Style, Color};
-use crossterm::event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode};
+use crossterm::event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEvent, KeyModifiers};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use util::{EditorDataStruct, EditorSettings, FileDataStruct, LineDataStruct};
 use std::io::{self, Cursor};
@@ -57,7 +57,7 @@ fn main() -> Result<(), io::Error> {
     execute!(
         io::stdout(),
         //DisableBlinking,
-        crossterm::cursor::SetCursorStyle::SteadyBlock
+        crossterm::cursor::SetCursorStyle::SteadyBar
     );
     
     let mut ed_dat:EditorDataStruct = EditorDataStruct { 
@@ -128,15 +128,17 @@ fn main() -> Result<(), io::Error> {
         }*/
         
         let mut is_updated;
-        let mut inputdat = None;
+        let mut inputdat: Option<KeyEvent> = None;
         let mut update_height;
+        let mut key_mods: Option<KeyModifiers> = None;
+        
         match input::check_input(event::read()?) {
-            (updated_check, Some(inpdat), updateh) => {
+            (updated_check, Some(inpdat), Some(key_mods), updateh) => {
                 update_height = updateh;
                 is_updated = updated_check;
                 inputdat = Some(inpdat);
             },
-            (updated_check, _, updateh) => {
+            (updated_check, _, _, updateh) => {
                 update_height = updateh;
                 is_updated = updated_check;
             }

@@ -1,3 +1,4 @@
+use crossterm::execute;
 use tui::backend::CrosstermBackend;
 use tui::widgets::{Block, Borders, Paragraph};
 use tui::layout::{Layout, Constraint, Direction};
@@ -6,6 +7,23 @@ use tui::Terminal;
 use crossterm::event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode};
 use crossterm::terminal::{self, disable_raw_mode, enable_raw_mode};
 use std::io;
+use crossterm::{
+    ExecutableCommand,
+    cursor::{DisableBlinking, EnableBlinking, MoveTo, RestorePosition, SavePosition}
+};
+
+use tui::widgets;
+use tui::layout;
+use tui::style;
+use crossterm;
+use util::{EditorDataStruct, EditorSettings, FileDataStruct, LineDataStruct};
+use std::io::{Cursor};
+use std::process;
+use std;
+
+use crossterm::{
+    cursor
+};
 
 use crate::{input, util, mover};
 
@@ -28,6 +46,7 @@ pub fn setup_ui() -> Result<Terminal<CrosstermBackend<io::Stdout>>, io::Error> {
 
 pub fn update_ui(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, ed_dat: &mut util::EditorDataStruct) -> Result<(), io::Error> {
     let tx_dat = &ed_dat.files[ed_dat.current_file_index as usize];
+    
     terminal.draw(|f| {
         // Create a full-screen layout
         let size = f.size();
