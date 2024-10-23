@@ -9,7 +9,7 @@ use crate::mover;
 use crate::util;
 
 
-pub fn check_input(keyenv: Event) -> (bool, Option<KeyEvent>, Option<KeyModifiers>, bool) {
+pub fn check_input(keyenv: Event) -> (bool, Option<KeyEvent>, bool) {
     let mut update = false;
 
     let mut up_h = false;
@@ -19,11 +19,11 @@ pub fn check_input(keyenv: Event) -> (bool, Option<KeyEvent>, Option<KeyModifier
     }
     if let event::Event::Key(key_event) = keyenv {
         if key_event.kind == crossterm::event::KeyEventKind::Press {
-            return (true, Some(key_event), Some(key_event.modifiers), up_h)
+            return (true, Some(key_event), up_h)
         }
     }
 
-    (update, None, None, up_h)
+    (update, None, up_h)
 }
 
 pub fn handle_keybind() {
@@ -48,10 +48,10 @@ pub fn handle_remove(editor_data: &mut util::EditorDataStruct, isDel: bool) {
         curline.line_text.remove(file_data.cursor_x as usize);
     } else {
 
-        if curline.line_length == editor_data.settings.line_endings {
-            file_data.file_lines.remove(file_data.cursor_y as usize);
+        if curline.line_length == editor_data.settings.line_endings as usize {
+            file_data.file_lines.remove(file_data.cursor_y);
             file_data.cursor_y -= 1;
-            curline = &mut file_data.file_lines[file_data.cursor_y as usize];
+            curline = &mut file_data.file_lines[file_data.cursor_y];
             file_data.cursor_x = curline.line_length-editor_data.settings.line_endings;
             return;
         }
@@ -63,8 +63,8 @@ pub fn handle_remove(editor_data: &mut util::EditorDataStruct, isDel: bool) {
             file_data.file_lines[file_data.cursor_y as usize].line_text.pop();
             file_data.file_lines[file_data.cursor_y as usize].line_text.push_str(&cursline);
             curline = &mut file_data.file_lines[file_data.cursor_y as usize];
-            file_data.cursor_x = curline.line_length-editor_data.settings.line_endings;
-            curline.line_length = curline.line_text.len() as i32;
+            file_data.cursor_x = curline.line_length-(editor_data.settings.line_endings as usize);
+            curline.line_length = curline.line_text.len();
             return;
         }
 

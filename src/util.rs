@@ -2,18 +2,20 @@ use core::error;
 use std::collections::binary_heap::Iter;
 use std::fs;
 use std::fs::File;
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
 use std::env;
 use std::iter::Map;
 use std::path::{Path, PathBuf};
 
 use tui::backend::CrosstermBackend;
 use tui::symbols::line;
-use tui::text::Text;
+use tui::text::{self, Text};
 use tui::widgets::canvas::Line;
 use tui::Terminal;
 use crossterm::event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode};
 use crossterm::terminal::{self, disable_raw_mode, enable_raw_mode};
+
+use std::convert::TryInto;
 
 impl EditorSettings {
     pub const UNIX_ENDINGS:i32 = 1;
@@ -29,16 +31,16 @@ pub struct EditorDataStruct<'a> {
     pub settings: EditorSettings,
     pub files: Vec<FileDataStruct<'a>>,
     pub current_file_index: i32,
-    pub term_w: i32,
-    pub term_h: i32
+    pub term_w: u16,
+    pub term_h: u16
 }
 
 pub struct FileDataStruct<'a> {
     pub file_name: &'a str,
     pub file_path: &'a str,
     pub file_lines: Vec<LineDataStruct>,
-    pub cursor_x: i32,
-    pub cursor_y: i32,
+    pub cursor_x: usize,
+    pub cursor_y: usize,
     pub rows_scrolled: i32,
     pub x_before_dip: i32,
     pub has_dip: bool
@@ -46,7 +48,7 @@ pub struct FileDataStruct<'a> {
 
 pub struct LineDataStruct {
     pub line_text: String,
-    pub line_length: i32,
+    pub line_length: usize,
 }
 
 
@@ -87,6 +89,7 @@ pub fn load_file_from_tx_dat_file_path(tx_dat: &mut FileDataStruct) -> io::Resul
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
     //Ok(Box::leak(contents.into_boxed_str()))
+
     Ok(Box::leak(contents.into_boxed_str()))
 }
 
@@ -123,11 +126,26 @@ pub fn init<'a>(tx_dat: &mut FileDataStruct, ed_set: &mut EditorSettings) -> io:
     for s in split_strings {
         line_vec_list.push(LineDataStruct {
             line_text: s.clone(),
-            line_length: (s.len() as i32)
+            line_length: s.len()
         });
     }
 
     tx_dat.file_lines = line_vec_list;
 
     Ok(())
+}
+
+
+pub fn saveFile(text_file: &mut FileDataStruct) {
+    println!("\n\n{}", text_file.file_path);
+    let mut file =  File::options()
+    .write(true).open(text_file.file_path.to_owned()).expect("Some error occured opening a file for writing");
+
+    let mut all_bytes = Vec::new();
+    for line in &text_file.file_lines {
+        all_bytes.extend(line.line_text.as_bytes());
+    }
+    let byte_slice: &[u8] = &all_bytes;
+
+    file.write(byte_slice).expect("Error writing file");
 }

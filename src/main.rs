@@ -24,20 +24,16 @@ fn main() -> Result<(), io::Error> {
     let editor_settings_loc = "";
     
     let mut load_dat:FileDataStruct = FileDataStruct {
-        file_path: "C:/TeDiDET/test.txt",
-        file_name: "main.rs",
+        file_path: "C:\\TeDiDET\\test.txt",
+        file_name: "test.txt",
         file_lines: vec![
         LineDataStruct {
-            line_text: String::from("Blank"),
-            line_length: String::from("Blank").len() as i32
+            line_text: String::from("File did not load it seems"),
+            line_length: String::from("File did not load it seems").len()
         },
         LineDataStruct {
-            line_text: String::from("Blank"),
-            line_length: String::from("Blank").len() as i32
-        },
-        LineDataStruct {
-            line_text: String::from("Blank"),
-            line_length: String::from("Blank").len() as i32
+            line_text: String::from("File did not load it seems"),
+            line_length: String::from("File did not load it seems").len()
         }],
         cursor_x: 0,
         cursor_y: 0,
@@ -133,12 +129,12 @@ fn main() -> Result<(), io::Error> {
         let mut key_mods: Option<KeyModifiers> = None;
         
         match input::check_input(event::read()?) {
-            (updated_check, Some(inpdat), Some(key_mods), updateh) => {
+            (updated_check, Some(inpdat), updateh) => {
                 update_height = updateh;
                 is_updated = updated_check;
                 inputdat = Some(inpdat);
             },
-            (updated_check, _, _, updateh) => {
+            (updated_check, _, updateh) => {
                 update_height = updateh;
                 is_updated = updated_check;
             }
@@ -151,6 +147,8 @@ fn main() -> Result<(), io::Error> {
             if update_height {
                 _ = util::update_height(&mut ed_dat, &mut term);
             }
+
+            
             if let Some(inputdat) = inputdat {
                 match inputdat.code {
                     // Handle the 'Enter' key
@@ -169,11 +167,24 @@ fn main() -> Result<(), io::Error> {
                     KeyCode::Delete => {
                         input::handle_remove(&mut ed_dat, true);
                     }
-                    KeyCode::Modifier(modifierKeyCode) => {
-                        print!("\n\n{}aa", modifierKeyCode);
-                    }
                     // Handle character input (letters, numbers, etc.)
                     KeyCode::Char(c) => {
+                        match inputdat.modifiers {
+                            KeyModifiers::CONTROL => {
+                                match c.to_ascii_lowercase() {
+                                    's' => {
+                                        util::saveFile(&mut ed_dat.files[ed_dat.current_file_index as usize]);
+                                    }
+                                    _ => {
+
+                                    }
+                                }
+                            }
+                            _ => {
+
+                            }
+                        }
+                        println!("\n\n{:?}",inputdat.modifiers);
                         input::handle_char_inp(&mut ed_dat, c);
                         //_ = ui::update_ui(&mut term, &mut ed_dat.files[ed_dat.current_file_index as usize], &mut ed_dat);
 
@@ -195,6 +206,7 @@ fn main() -> Result<(), io::Error> {
                     }
                 }
             }
+            
             _ = ui::update_ui(&mut term, &mut ed_dat);
         }
         // println!("{}", tx_dat.file_dat);
