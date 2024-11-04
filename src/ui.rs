@@ -45,7 +45,7 @@ pub fn setup_ui() -> Result<Terminal<CrosstermBackend<io::Stdout>>, io::Error> {
 }
 
 pub fn update_ui(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, ed_dat: &mut util::EditorDataStruct) -> Result<(), io::Error> {
-    let tx_dat = &ed_dat.files[ed_dat.current_file_index as usize];
+    let tx_dat = &ed_dat.files[ed_dat.current_file_index];
     
     terminal.draw(|f| {
         // Create a full-screen layout
@@ -70,8 +70,8 @@ pub fn update_ui(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, ed_dat: 
             .split(size);
         
         //let selected_lines = &tx_dat.file_lines[tx_dat.rows_scrolled..(tx_dat.rows_scrolled+ed_dat.term_h).min(tx_dat.file_lines.len())];  // 0-indexed, so 15 is at index 14
-        let start_index = tx_dat.rows_scrolled.max(0) as usize; // Ensure non-negative and cast to usize
-        let end_index = (tx_dat.rows_scrolled + ed_dat.term_h).min(tx_dat.file_lines.len() as i32) as usize;
+        let start_index = tx_dat.rows_scrolled.max(0); // Ensure non-negative and cast to usize
+        let end_index = (tx_dat.rows_scrolled + ed_dat.term_h as usize).min(tx_dat.file_lines.len());
         
         // Make sure end_index doesn't exceed file_lines length
         //let end_index = end_index.min(tx_dat.file_lines.len());

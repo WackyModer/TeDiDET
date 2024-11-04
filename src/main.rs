@@ -144,12 +144,35 @@ fn main() -> Result<(), io::Error> {
         }
         
         if is_updated {
-            if update_height {
-                _ = util::update_height(&mut ed_dat, &mut term);
-            }
-
-            
             if let Some(inputdat) = inputdat {
+                match inputdat.modifiers {
+                    KeyModifiers::CONTROL => {
+                        match inputdat.code {
+                            KeyCode::Right => {
+                                
+                            }
+                            KeyCode::Char(c) => {
+                                match c.to_ascii_lowercase() {
+                                    's' => {
+                                        util::saveFile(&mut ed_dat.files[ed_dat.current_file_index]);
+                                    }
+                                    _ => {
+
+                                    }
+                                }
+                            }
+                            _ => {
+
+                            }
+                        }
+                    }
+                    KeyModifiers::NONE => {
+
+                    }
+                    _ => {
+
+                    }
+                }
                 match inputdat.code {
                     // Handle the 'Enter' key
                     KeyCode::Enter => {
@@ -169,24 +192,9 @@ fn main() -> Result<(), io::Error> {
                     }
                     // Handle character input (letters, numbers, etc.)
                     KeyCode::Char(c) => {
-                        match inputdat.modifiers {
-                            KeyModifiers::CONTROL => {
-                                match c.to_ascii_lowercase() {
-                                    's' => {
-                                        util::saveFile(&mut ed_dat.files[ed_dat.current_file_index as usize]);
-                                    }
-                                    _ => {
-
-                                    }
-                                }
-                            }
-                            _ => {
-
-                            }
-                        }
                         println!("\n\n{:?}",inputdat.modifiers);
                         input::handle_char_inp(&mut ed_dat, c);
-                        //_ = ui::update_ui(&mut term, &mut ed_dat.files[ed_dat.current_file_index as usize], &mut ed_dat);
+                        //_ = ui::update_ui(&mut term, &mut ed_dat.files[ed_dat.current_file_index], &mut ed_dat);
 
                     }
                     KeyCode::Left => {
@@ -207,6 +215,9 @@ fn main() -> Result<(), io::Error> {
                 }
             }
             
+            if update_height {
+                _ = util::update_height(&mut ed_dat, &mut term);
+            }
             _ = ui::update_ui(&mut term, &mut ed_dat);
         }
         // println!("{}", tx_dat.file_dat);

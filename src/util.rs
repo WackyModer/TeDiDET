@@ -18,19 +18,19 @@ use crossterm::terminal::{self, disable_raw_mode, enable_raw_mode};
 use std::convert::TryInto;
 
 impl EditorSettings {
-    pub const UNIX_ENDINGS:i32 = 1;
-    pub const DOS_ENDINGS:i32 = 2;
+    pub const UNIX_ENDINGS:usize = 1;
+    pub const DOS_ENDINGS:usize = 2;
 }
 
 pub struct EditorSettings {
-    pub line_endings: i32,
+    pub line_endings: usize,
     pub config_path: String
 }
 
 pub struct EditorDataStruct<'a> {
     pub settings: EditorSettings,
     pub files: Vec<FileDataStruct<'a>>,
-    pub current_file_index: i32,
+    pub current_file_index: usize,
     pub term_w: u16,
     pub term_h: u16
 }
@@ -41,8 +41,8 @@ pub struct FileDataStruct<'a> {
     pub file_lines: Vec<LineDataStruct>,
     pub cursor_x: usize,
     pub cursor_y: usize,
-    pub rows_scrolled: i32,
-    pub x_before_dip: i32,
+    pub rows_scrolled: usize,
+    pub x_before_dip: usize,
     pub has_dip: bool
 }
 
@@ -95,8 +95,8 @@ pub fn load_file_from_tx_dat_file_path(tx_dat: &mut FileDataStruct) -> io::Resul
 
 pub fn update_height(ed_dat: &mut EditorDataStruct, terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> io::Result<()>{
     let size =  terminal.size()?;
-    ed_dat.term_h = size.height as i32;
-    ed_dat.term_w = size.width as i32;
+    ed_dat.term_h = size.height;
+    ed_dat.term_w = size.width;
     Ok(())
 }
 
